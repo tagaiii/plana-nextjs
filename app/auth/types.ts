@@ -4,6 +4,6 @@ export const enum AuthTabs {
 }
 
 export interface ActionState {
-  error: string;
-  message?: string;
+  success: boolean;
+  error: string | null;
 }

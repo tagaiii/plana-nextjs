@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/server';
 import { ActionState } from './types';
@@ -16,11 +15,12 @@ export async function login(_: ActionState, formData: FormData) {
 
   const { error } = await supabase.auth.signInWithPassword(data);
   if (error) {
-    return { error: error.message };
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
-  redirect('/');
+
+  return { success: true, error: null };
 }
 
 export async function signup(_: ActionState, formData: FormData) {
@@ -33,9 +33,9 @@ export async function signup(_: ActionState, formData: FormData) {
 
   const { error } = await supabase.auth.signUp(data);
   if (error) {
-    return { error: error.message };
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
-  redirect('/');
+  return { success: true, error: null };
 }

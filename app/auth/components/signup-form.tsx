@@ -1,16 +1,25 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { signup } from '../actions';
 import { ActionState } from '../types';
 
 const initialState: ActionState = {
+  success: false,
   error: '',
 };
 
 export default function SignupForm() {
   const [state, formAction] = useActionState(signup, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      window.location.href = '/';
+    }
+  }, [state]);
 
   return (
     <form action={formAction}>
@@ -24,7 +33,7 @@ export default function SignupForm() {
           <Input id="password" type="password" name="password" required />
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="confirm-password">Confirm assword</Label>
+          <Label htmlFor="confirm-password">Confirm password</Label>
           <Input
             id="confirm-password"
             type="password"

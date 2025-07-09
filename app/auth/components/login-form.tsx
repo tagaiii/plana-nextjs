@@ -1,4 +1,6 @@
-import { useActionState } from 'react';
+'use client';
+
+import { useActionState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,11 +8,18 @@ import { login } from '../actions';
 import { ActionState } from '../types';
 
 const initialState: ActionState = {
+  success: false,
   error: '',
 };
 
 export default function LoginForm() {
   const [state, formAction] = useActionState(login, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      window.location.href = '/';
+    }
+  }, [state]);
 
   return (
     <form action={formAction}>
