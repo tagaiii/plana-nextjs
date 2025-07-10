@@ -48,7 +48,6 @@ export default function SignupForm() {
           onClick: () => toast.dismiss(),
         },
       });
-      console.log(errors);
       router.push('/');
     }
   }, [router, state, errors]);
@@ -84,7 +83,6 @@ export default function SignupForm() {
       setPassword(value);
     }
     validate(name, value);
-    console.log(!!errors['confirm-password']);
   };
 
   return (
