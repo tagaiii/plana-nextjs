@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,36 @@ const initialState: ActionState = {
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
+  const [touched, setTouched] = useState({ email: false, password: false });
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
   const router = useRouter();
+
+  const validate = (name: string, value: string) => {
+    let error = '';
+    if (name === 'email') {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!value) {
+        error = 'Email is required';
+      } else if (!emailPattern.test(value)) {
+        error = 'Invalid email format';
+      }
+    } else if (name === 'password') {
+      if (!value) {
+        error = 'Password is required';
+      } else if (value.length < 6) {
+        error = 'Password must be at least 6 characters';
+      }
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    validate(name, value);
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -37,11 +66,31 @@ export default function LoginForm() {
       <div className="space-y-4">
         <div className="flex flex-col gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" name="email" required />
+          <Input
+            id="email"
+            type="email"
+            name="email"
+            required
+            onChange={handleChange}
+            onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+          />
+          {touched.email && errors.email && (
+            <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" name="password" required />
+          <Input
+            id="password"
+            type="password"
+            name="password"
+            required
+            onChange={handleChange}
+            onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
+          />
+          {touched.password && errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
         </div>
       </div>
       <Button type="submit" className="mt-4 w-full" disabled={isPending}>
