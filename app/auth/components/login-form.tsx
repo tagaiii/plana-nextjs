@@ -18,10 +18,15 @@ const initialState: ActionState = {
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
   const [touched, setTouched] = useState({ email: false, password: false });
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {}
-  );
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({
+    email: 'Email is required',
+    password: 'Password is required',
+  });
   const router = useRouter();
+
+  const checkErrors = () => {
+    return Object.values(errors).some((error) => error);
+  };
 
   const validate = (name: string, value: string) => {
     let error = '';
@@ -40,7 +45,6 @@ export default function LoginForm() {
       }
     }
     setErrors((prev) => ({ ...prev, [name]: error }));
-    return error;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +97,11 @@ export default function LoginForm() {
           )}
         </div>
       </div>
-      <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+      <Button
+        type="submit"
+        className="mt-4 w-full"
+        disabled={isPending || checkErrors()}
+      >
         {isPending ? <LoaderCircle className="animate-spin" /> : null}
         Login
       </Button>

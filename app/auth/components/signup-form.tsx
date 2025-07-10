@@ -27,8 +27,16 @@ export default function SignupForm() {
     email?: string;
     password?: string;
     'confirm-password'?: string;
-  }>({});
+  }>({
+    email: 'Email is required',
+    password: 'Password is required',
+    'confirm-password': 'Confirm password is required',
+  });
   const router = useRouter();
+
+  const checkErrors = () => {
+    return Object.values(errors).some((error) => error);
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -40,9 +48,10 @@ export default function SignupForm() {
           onClick: () => toast.dismiss(),
         },
       });
+      console.log(errors);
       router.push('/');
     }
-  }, [router, state]);
+  }, [router, state, errors]);
 
   const validate = (name: string, value: string) => {
     let error = '';
@@ -67,7 +76,6 @@ export default function SignupForm() {
       }
     }
     setErrors((prev) => ({ ...prev, [name]: error }));
-    return error;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +84,7 @@ export default function SignupForm() {
       setPassword(value);
     }
     validate(name, value);
+    console.log(!!errors['confirm-password']);
   };
 
   return (
@@ -133,7 +142,7 @@ export default function SignupForm() {
       <Button
         type="submit"
         className="mt-4 w-full"
-        disabled={isPending || !!errors}
+        disabled={isPending || checkErrors()}
       >
         {isPending ? <LoaderCircle className="animate-spin" /> : null}
         Sign Up
