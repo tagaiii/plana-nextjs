@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login } from '../actions';
 import { ActionState } from '../types';
+import { useRouter } from 'next/navigation';
+import { LoaderCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const initialState: ActionState = {
   success: false,
@@ -13,13 +16,21 @@ const initialState: ActionState = {
 };
 
 export default function LoginForm() {
-  const [state, formAction] = useActionState(login, initialState);
+  const [state, formAction, isPending] = useActionState(login, initialState);
+  const router = useRouter();
 
   useEffect(() => {
     if (state.success) {
-      window.location.href = '/';
+      toast.success('You have logged in successfully!', {
+        duration: 3000,
+        action: {
+          label: 'Close',
+          onClick: () => toast.dismiss(),
+        },
+      });
+      router.push('/');
     }
-  }, [state]);
+  }, [router, state]);
 
   return (
     <form action={formAction}>
@@ -33,7 +44,8 @@ export default function LoginForm() {
           <Input id="password" type="password" name="password" required />
         </div>
       </div>
-      <Button type="submit" className="mt-4 w-full">
+      <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+        {isPending ? <LoaderCircle className="animate-spin" /> : null}
         Login
       </Button>
       {state.error && <p className="text-red-500 mt-2">{state.error}</p>}

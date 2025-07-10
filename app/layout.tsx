@@ -3,6 +3,8 @@ import Navbar from '@/components/navbar';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { createClient } from '@/lib/supabase/server';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
   variable: '--font-sans',
@@ -19,11 +21,16 @@ export const metadata: Metadata = {
   description: 'Implemented by Tagai Kamalov',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <>
       <html lang="en" suppressHydrationWarning>
@@ -37,8 +44,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
+            <Navbar user={user} />
             {children}
+            <Toaster position="top-center" />
           </ThemeProvider>
         </body>
       </html>

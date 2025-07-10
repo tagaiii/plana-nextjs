@@ -6,6 +6,9 @@ import { Label } from '@/components/ui/label';
 import { useActionState, useEffect } from 'react';
 import { signup } from '../actions';
 import { ActionState } from '../types';
+import { useRouter } from 'next/navigation';
+import { LoaderCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const initialState: ActionState = {
   success: false,
@@ -13,13 +16,22 @@ const initialState: ActionState = {
 };
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState(signup, initialState);
+  const [state, formAction, isPending] = useActionState(signup, initialState);
+  const router = useRouter();
 
   useEffect(() => {
     if (state.success) {
-      window.location.href = '/';
+      toast.success('You have signed up successfully!', {
+        description: 'Please check your email to verify your account.',
+        duration: 6000,
+        action: {
+          label: 'Close',
+          onClick: () => toast.dismiss(),
+        },
+      });
+      router.push('/');
     }
-  }, [state]);
+  }, [router, state]);
 
   return (
     <form action={formAction}>
@@ -42,7 +54,8 @@ export default function SignupForm() {
           />
         </div>
       </div>
-      <Button type="submit" className="mt-4 w-full">
+      <Button type="submit" className="mt-4 w-full" disabled={isPending}>
+        {isPending ? <LoaderCircle className="animate-spin" /> : null}
         Sign Up
       </Button>
       {state.error && <p className="text-red-500 mt-2">{state.error}</p>}
